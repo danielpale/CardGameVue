@@ -2,8 +2,6 @@
 import { computed, useTemplateRef } from 'vue'
 import { gsap } from 'gsap'
 
-defineExpose({ flipCard })
-
 const POSITIONS = {
   back: { row: 0, col: 0 },
 
@@ -69,10 +67,17 @@ const WIDTH = 165
 const MARGIN = 2
 
 const props = defineProps({ card: { type: String, default: 'back' } })
+const model = defineModel({ type: [Boolean, Array], default: false })
 
-const templateRef = useTemplateRef('baseCard')
 let tween
+const templateRef = useTemplateRef('baseCard')
+
 const position = computed(() => getCardPosition(props.card))
+const selected = computed(() => {
+  if (typeof model.value === 'boolean') return model.value
+  if (Array.isArray(model.value)) return model.value.includes(props.card)
+  return model.value
+})
 
 function getCardPosition(card) {
   const { row, col, offsetX, offsetY } = POSITIONS[card]
@@ -82,11 +87,36 @@ function getCardPosition(card) {
 function flipCard() {
   const rotationY = !tween?.vars?.rotationY ? 180 : 0
   tween = gsap.to(templateRef.value, { rotationY, duration: 0.5, ease: 'power1.inOut' })
+  return rotationY === 180 // Flipped
 }
+
+function selectCard() {
+  if (typeof model.value === 'boolean') model.value = true
+  if (Array.isArray(model.value)) model.value.push(props.card)
+}
+
+function deselectCard() {
+  if (typeof model.value === 'boolean') model.value = false
+  if (Array.isArray(model.value)) {
+    const index = model.value.indexOf(props.card)
+    model.value.splice(index, 1)
+  }
+}
+
+function getCardId() {
+  return props.card
+}
+
+defineExpose({ flipCard, selectCard, deselectCard, getCardId, id: props.card, selected: selected })
 </script>
 
 <template>
-  <div class="base-card__container" :style="{ height: `${HEIGHT}px`, width: `${WIDTH}px` }">
+  <div
+    class="base-card__container"
+    :class="{ 'base-card--selected': selected }"
+    :style="{ height: `${HEIGHT}px`, width: `${WIDTH}px` }"
+    @click="selected ? deselectCard() : selectCard()"
+  >
     <div ref="baseCard" class="base-card">
       <span class="base-card__front" :style="{ backgroundPosition: position }"></span>
       <span class="base-card__back"></span>
@@ -105,6 +135,24 @@ function flipCard() {
     perspective: 1000px;
     cursor: pointer;
     flex-shrink: 0;
+
+    &::before {
+      --border-offset: 4px;
+      content: '';
+      position: absolute;
+      top: calc(0px - var(--border-offset));
+      left: calc(0px - var(--border-offset));
+      width: calc(100% + (var(--border-offset) * 2));
+      height: calc(100% + (var(--border-offset) * 2));
+      border: 4px solid #f9db27;
+      border-radius: calc(20px + (var(--border-offset) / 2));
+      opacity: 0;
+      transition: opacity 120ms ease-in-out;
+    }
+
+    &:hover::before {
+      opacity: 0.4;
+    }
   }
 
   &__front,
@@ -122,5 +170,9 @@ function flipCard() {
     transform: rotateY(180deg);
     background-position: 0 0;
   }
+}
+
+.base-card--selected.base-card__container::before {
+  opacity: 1;
 }
 </style>
