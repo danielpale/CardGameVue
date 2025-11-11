@@ -14,6 +14,11 @@ const router = createRouter({
           name: 'CardPlayground',
           component: () => import('@/views/CardPlaygroundView.vue'),
         },
+        {
+          path: 'DeckPlayground',
+          name: 'DeckPlayground',
+          component: () => import('@/views/DeckPlaygroundView.vue'),
+        },
       ],
     },
   ],

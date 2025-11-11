@@ -1,5 +1,5 @@
 <script setup>
-import { computed, useTemplateRef } from 'vue'
+import { computed, inject, useTemplateRef, watch } from 'vue'
 import { gsap } from 'gsap'
 
 const POSITIONS = {
@@ -67,46 +67,82 @@ const WIDTH = 165
 const MARGIN = 2
 
 const props = defineProps({ card: { type: String, default: 'back' } })
-const model = defineModel({ type: [Boolean, Array], default: false })
+const model = defineModel({ type: [Boolean, Array, String], default: false })
 
 let tween
 const templateRef = useTemplateRef('baseCard')
+const containerTemplateRef = useTemplateRef('baseCardContainer')
+const insideDeck = inject('insideDeck', false)
 
 const position = computed(() => getCardPosition(props.card))
 const selected = computed(() => {
   if (typeof model.value === 'boolean') return model.value
+  if (typeof model.value === 'string' || model.value === null) return model.value === props.card
   if (Array.isArray(model.value)) return model.value.includes(props.card)
   return model.value
 })
 
+watch(selected, (value) => {
+  if (!insideDeck) return
+  if (value) {
+    gsap.to(containerTemplateRef.value, { y: -HEIGHT / 2, duration: 0.5, ease: 'power1.inOut' })
+  } else {
+    gsap.to(containerTemplateRef.value, { y: 0, duration: 0.5, ease: 'power1.inOut' })
+  }
+})
+
+// Card Functions
 function getCardPosition(card) {
   const { row, col, offsetX, offsetY } = POSITIONS[card]
   return `-${col * WIDTH + (col !== 0 ? MARGIN : 0) + offsetX}px -${row * HEIGHT + (row !== 0 ? MARGIN : 0) + offsetY}px`
 }
-
 function flipCard() {
   const rotationY = !tween?.vars?.rotationY ? 180 : 0
   tween = gsap.to(templateRef.value, { rotationY, duration: 0.5, ease: 'power1.inOut' })
   return rotationY === 180 // Flipped
 }
-
 function selectCard() {
   if (typeof model.value === 'boolean') model.value = true
+  if (typeof model.value === 'string' || model.value === null) model.value = props.card
   if (Array.isArray(model.value)) {
     if (!model.value.includes(props.card)) model.value.push(props.card)
   }
 }
-
 function deselectCard() {
   if (typeof model.value === 'boolean') model.value = false
+  if (typeof model.value === 'string' || model.value === null) model.value = null
   if (Array.isArray(model.value)) {
     const index = model.value.indexOf(props.card)
     model.value.splice(index, 1)
   }
 }
-
 function getCard() {
   return props.card
+}
+
+// Event Handlers
+let mouseEnterTween
+function handleMouseEnter() {
+  mouseEnterTween = gsap.to(containerTemplateRef.value, {
+    '--border-opacity': 0.4,
+    duration: 0.12,
+    ease: 'power1.inOut',
+  })
+  if (!insideDeck) return
+  gsap.to(containerTemplateRef.value, {
+    '--margin-right': 116,
+    duration: 0.36,
+    ease: 'power1.inOut',
+  })
+}
+function handleMouseLeave() {
+  mouseEnterTween.revert()
+  if (!insideDeck) return
+  gsap.to(containerTemplateRef.value, {
+    '--margin-right': 0,
+    duration: 0.36,
+    ease: 'power1.inOut',
+  })
 }
 
 defineExpose({ flipCard, selectCard, deselectCard, getCard, card: props.card, selected: selected })
@@ -115,8 +151,11 @@ defineExpose({ flipCard, selectCard, deselectCard, getCard, card: props.card, se
 <template>
   <div
     class="base-card__container"
+    ref="baseCardContainer"
     :class="{ 'base-card--selected': selected }"
     :style="{ height: `${HEIGHT}px`, width: `${WIDTH}px` }"
+    @mouseenter="handleMouseEnter"
+    @mouseleave="handleMouseLeave"
     @click="selected ? deselectCard() : selectCard()"
   >
     <div ref="baseCard" class="base-card">
@@ -134,9 +173,12 @@ defineExpose({ flipCard, selectCard, deselectCard, getCard, card: props.card, se
   transform-style: preserve-3d;
 
   &__container {
+    --border-opacity: 0;
+    --margin-right: 0px;
     perspective: 1000px;
     cursor: pointer;
     flex-shrink: 0;
+    margin-right: var(--margin-right);
 
     &::before {
       --border-offset: 4px;
@@ -148,13 +190,12 @@ defineExpose({ flipCard, selectCard, deselectCard, getCard, card: props.card, se
       height: calc(100% + (var(--border-offset) * 2));
       border: 4px solid #f9db27;
       border-radius: calc(20px + (var(--border-offset) / 2));
-      opacity: 0;
-      transition: opacity 120ms ease-in-out;
+      opacity: var(--border-opacity);
     }
 
-    &:hover::before {
-      opacity: 0.4;
-    }
+    // &:hover::before {
+    //   opacity: 0.4;
+    // }
   }
 
   &__front,
@@ -174,7 +215,7 @@ defineExpose({ flipCard, selectCard, deselectCard, getCard, card: props.card, se
   }
 }
 
-.base-card--selected.base-card__container::before {
-  opacity: 1;
+.base-card--selected.base-card__container {
+  --border-opacity: 1 !important;
 }
 </style>
