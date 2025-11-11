@@ -73,7 +73,7 @@ function toggleSelectAll() {
 function flipSelectedCards() {
   const _cards = cardsRef.value.filter((card) => card.selected)
   for (const card of _cards) {
-    if (cardsSelected.value.includes(card.id)) card.flipCard()
+    card.flipCard()
   }
 }
 
