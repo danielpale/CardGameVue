@@ -92,7 +92,9 @@ function flipCard() {
 
 function selectCard() {
   if (typeof model.value === 'boolean') model.value = true
-  if (Array.isArray(model.value)) model.value.push(props.card)
+  if (Array.isArray(model.value)) {
+    if (!model.value.includes(props.card)) model.value.push(props.card)
+  }
 }
 
 function deselectCard() {
@@ -103,11 +105,11 @@ function deselectCard() {
   }
 }
 
-function getCardId() {
+function getCard() {
   return props.card
 }
 
-defineExpose({ flipCard, selectCard, deselectCard, getCardId, id: props.card, selected: selected })
+defineExpose({ flipCard, selectCard, deselectCard, getCard, card: props.card, selected: selected })
 </script>
 
 <template>
