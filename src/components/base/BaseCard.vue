@@ -2,10 +2,8 @@
 import { computed, inject, useTemplateRef, watch } from 'vue'
 import { gsap } from 'gsap'
 
-import { POSITIONS } from '@/constants/card'
+import { POSITIONS, HEIGHT, WIDTH } from '@/constants/card'
 
-const HEIGHT = 256
-const WIDTH = 164
 const SPRITE_WIDTH = 2048
 const SPRITE_HEIGHT = 2048
 
@@ -16,6 +14,7 @@ let tween
 const templateRef = useTemplateRef('baseCard')
 const containerTemplateRef = useTemplateRef('baseCardContainer')
 const insideDeck = inject('insideDeck', false)
+const overlap = inject('overlap', 0)
 
 const style = computed(() => getCardStyle(props.card))
 const selected = computed(() => {
@@ -69,22 +68,22 @@ function getCard() {
 }
 
 // Event Handlers
-let mouseEnterTween
+let borderOpacityTween
 function handleMouseEnter() {
-  mouseEnterTween = gsap.to(containerTemplateRef.value, {
+  borderOpacityTween = gsap.to(containerTemplateRef.value, {
     '--border-opacity': 0.4,
     duration: 0.12,
     ease: 'power1.inOut',
   })
   if (!insideDeck) return
   gsap.to(containerTemplateRef.value, {
-    '--margin-right': 116,
+    '--margin-right': overlap.value * 1.1,
     duration: 0.36,
     ease: 'power1.inOut',
   })
 }
 function handleMouseLeave() {
-  mouseEnterTween.revert()
+  borderOpacityTween.revert()
   if (!insideDeck) return
   gsap.to(containerTemplateRef.value, {
     '--margin-right': 0,
@@ -161,5 +160,6 @@ defineExpose({ flipCard, selectCard, deselectCard, getCard, card: props.card, se
 
 .base-card--selected.base-card__container {
   --border-opacity: 1 !important;
+  z-index: 1;
 }
 </style>

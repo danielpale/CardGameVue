@@ -1,6 +1,18 @@
 <script setup>
-import { ref, provide } from 'vue'
+import { ref, provide, useTemplateRef, onMounted, onBeforeUnmount, computed } from 'vue'
+
 import BaseCard from '@/components/base/BaseCard.vue'
+
+import { WIDTH } from '@/constants/card.js'
+
+onMounted(() => {
+  updateContainerWidth()
+  window.addEventListener('resize', updateContainerWidth)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateContainerWidth)
+})
 
 const cards = [
   'yellow-1',
@@ -28,13 +40,29 @@ const cards = [
   'red-0',
 ]
 
-provide('insideDeck', true)
-
 const cardSelected = ref(null)
+const containerWidth = ref(0)
+const baseDeckRef = useTemplateRef('baseDeck')
+
+const overlap = computed(() => {
+  const numCards = cards.length
+  if (numCards <= 1) return 0
+  const rawOverlap = (WIDTH * numCards - containerWidth.value) / (numCards - 1)
+  return rawOverlap
+  // const minOverlap = WIDTH - WIDTH * 0.2
+  // return Math.min(Math.max(rawOverlap, minOverlap), WIDTH * 0.9)
+})
+
+function updateContainerWidth() {
+  containerWidth.value = baseDeckRef.value.parentElement.clientWidth //baseDeckRef.value.clientWidth
+}
+
+provide('insideDeck', true)
+provide('overlap', overlap)
 </script>
 
 <template>
-  <div class="base-deck">
+  <div ref="baseDeck" class="base-deck" :style="{ '--overlap': `-${overlap}px` }">
     <base-card v-model="cardSelected" v-for="card in cards" :key="card" :card="card" />
   </div>
 </template>
@@ -42,10 +70,12 @@ const cardSelected = ref(null)
 <style lang="scss" scoped>
 .base-deck {
   display: flex;
+  justify-content: center;
   align-items: center;
+  width: 100%;
 
-  & > .base-card__container {
-    margin-left: -100px;
+  & > .base-card__container:not(:first-child) {
+    margin-left: var(--overlap);
   }
 }
 </style>

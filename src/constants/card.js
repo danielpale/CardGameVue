@@ -1,3 +1,6 @@
+export const HEIGHT = 256
+export const WIDTH = 164
+
 export const POSITIONS = {
   back: { x: 0, y: 0, w: 164, h: 255 },
 
