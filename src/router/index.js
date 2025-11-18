@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import PlaygroundLayout from '@/components/layout/PlaygroundLayout.vue'
 import TheMainLayout from '@/components/layout/TheMainLayout.vue'
 
 const router = createRouter({
@@ -7,15 +8,27 @@ const router = createRouter({
     {
       path: '/',
       component: TheMainLayout,
+      redirect: { name: 'Home' },
+      children: [
+        {
+          path: 'Home',
+          name: 'Home',
+          component: () => import('@/views/HomeView.vue'),
+        },
+      ],
+    },
+    {
+      path: '/Playground',
+      component: PlaygroundLayout,
       redirect: { name: 'CardPlayground' },
       children: [
         {
-          path: 'CardPlayground',
+          path: 'Card',
           name: 'CardPlayground',
           component: () => import('@/views/CardPlaygroundView.vue'),
         },
         {
-          path: 'DeckPlayground',
+          path: 'Deck',
           name: 'DeckPlayground',
           component: () => import('@/views/DeckPlaygroundView.vue'),
         },
