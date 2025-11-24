@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
-const routes = computed(() => router.getRoutes().filter((route) => route.path !== '/'))
+const routes = computed(() => router.getRoutes().filter((route) => route.meta.testing))
 </script>
 
 <template>
