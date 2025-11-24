@@ -5,6 +5,8 @@ import BaseCard from '@/components/base/BaseCard.vue'
 
 import { WIDTH } from '@/constants/card.js'
 
+const props = defineProps({ cards: { type: Array, default: () => [] } })
+
 onMounted(() => {
   updateContainerWidth()
   window.addEventListener('resize', updateContainerWidth)
@@ -14,38 +16,12 @@ onBeforeUnmount(() => {
   window.removeEventListener('resize', updateContainerWidth)
 })
 
-const cards = [
-  'yellow-1',
-  'yellow-2',
-  'yellow-3',
-  'yellow-4',
-  'yellow-5',
-  'yellow-6',
-  'yellow-7',
-  'yellow-8',
-  'yellow-9',
-  'yellow-0',
-  'yellow-plus-two',
-  'yellow-skip',
-  'yellow-reverse',
-  'red-1',
-  'red-2',
-  'red-3',
-  'red-4',
-  'red-5',
-  'red-6',
-  'red-7',
-  'red-8',
-  'red-9',
-  'red-0',
-]
-
 const cardSelected = ref(null)
 const containerWidth = ref(0)
 const baseDeckRef = useTemplateRef('baseDeck')
 
 const overlap = computed(() => {
-  const numCards = cards.length
+  const numCards = props.cards.length
   if (numCards <= 1) return 0
   const rawOverlap = (WIDTH * numCards - containerWidth.value) / (numCards - 1)
   return rawOverlap
