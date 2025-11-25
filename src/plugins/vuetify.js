@@ -10,4 +10,11 @@ export const vuetify = createVuetify({
       custom,
     },
   },
+  defaults: {
+    VBtn: {
+      color: 'black',
+      variant: 'flat',
+      rounded: 0,
+    },
+  },
 })
