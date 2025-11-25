@@ -1,30 +1,42 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 
 import BaseSection from '@/components/base/BaseSection.vue'
 import BaseDialog from '@/components/base/BaseDialog.vue'
 
-import { createGame, joinGame } from '@/api'
+import { createGame, joinGame, startGame } from '@/api'
 
 import { useGameStore } from '@/stores/game'
 
-const gameStore = useGameStore()
-const { players, gameId } = storeToRefs(gameStore)
+const router = useRouter()
 
-const waitingDialog = ref(false)
+const gameStore = useGameStore()
+const { players, gameId, started } = storeToRefs(gameStore)
+
+watch(started, () => {
+  router.push({ name: 'Game' })
+})
+
+const idleDialog = ref(false)
 
 const startBtnDisabled = computed(() => players.value.length <= 1)
 
 async function handleCreateGame() {
   const [error, data] = await createGame()
   if (error) return
-  gameStore.initSSE(data.gameId, data.playerId)
-  waitingDialog.value = true
+  gameStore.initSSE(data.gameId, data.playerId, initSSESuccess)
 }
-function handleCloseGamePreview() {
-  waitingDialog.value = false
+function initSSESuccess() {
+  idleDialog.value = true
+}
+function handleCloseIdleDialog() {
+  idleDialog.value = false
   gameStore.purge()
+}
+async function handleStartGame() {
+  startGame(gameId.value)
 }
 
 const joinDialog = ref(false)
@@ -39,11 +51,12 @@ function handleCloseStartJoin() {
 }
 async function handleJoinGame() {
   const [error, data] = await joinGame(gameIdEntered.value)
-  // TODO: Implement when things goes wrong
   if (error) return
-  gameStore.initSSE(data.gameId, data.playerId)
-  joinDialog.value = false
-  waitingDialog.value = true
+  gameStore.initSSE(data.gameId, data.playerId, handleJoinGameSuccess)
+}
+function handleJoinGameSuccess() {
+  handleCloseStartJoin()
+  idleDialog.value = true
 }
 </script>
 
@@ -54,11 +67,7 @@ async function handleJoinGame() {
     <v-btn variant="outlined" @click="handleStartJoin">Join Game</v-btn>
   </base-section>
 
-  <base-dialog
-    v-model="waitingDialog"
-    :title="`GAME ID: ${gameId}`"
-    @on-close="handleCloseGamePreview"
-  >
+  <base-dialog v-model="idleDialog" :title="`GAME ID: ${gameId}`" @on-close="handleCloseIdleDialog">
     <v-list class="py-0" density="compact">
       <v-list-subheader class="font-weight-bold">Players:</v-list-subheader>
       <v-list-item v-for="player in players" :key="player.id" :value="player.id">
@@ -68,8 +77,8 @@ async function handleJoinGame() {
       </v-list-item>
     </v-list>
     <template #actions>
-      <v-btn variant="outlined" @click="handleCloseGamePreview">Close Game</v-btn>
-      <v-btn variant="flat" :disabled="startBtnDisabled">Start Game</v-btn>
+      <v-btn variant="outlined" @click="handleCloseIdleDialog">Close Game</v-btn>
+      <v-btn variant="flat" :disabled="startBtnDisabled" @click="handleStartGame">Start Game</v-btn>
     </template>
   </base-dialog>
 

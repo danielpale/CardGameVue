@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { reactive, ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 
 import { sseService } from '@/services/sse-service'
@@ -6,33 +6,53 @@ import { sseService } from '@/services/sse-service'
 export const useGameStore = defineStore('game', () => {
   const players = ref([])
   const gameId = ref(null)
+  const playerId = ref(null)
+  const started = ref(false)
+  const state = reactive({})
 
-  function initSSE(gameId, playerId) {
-    sseService.connect(gameId, playerId)
+  const opponents = computed(() => players.value.filter((p) => p.id !== playerId.value))
+  const cards = computed(() => {
+    if (!Array.isArray(state?.Hand)) return []
+    return state.Hand.map((i) => `${i.color}-${i.number}`)
+  })
+
+  function initSSE(newGameId, newPlayerId, onSuccess = () => {}, onError = () => {}) {
+    playerId.value = newPlayerId
+
+    sseService.connect(newGameId, newPlayerId)
+
+    sseService.on('error', onError)
+    sseService.on('open', onSuccess)
 
     sseService.addEvent('Message')
-
     sseService.on('Message', (data) => {
       const { action, ...payload } = data
       console.log(action, payload)
+
       switch (action) {
         case 'PlayerConnected':
           onPlayerConnected(payload)
+          break
+        case 'GameStarted':
+          started.value = true
+          break
+        case 'GameUpdated':
+          Object.assign(state, payload.state)
           break
       }
     })
   }
 
   function onPlayerConnected(payload) {
-    addPlayer(payload.playerId)
-    setGameId(payload.gameId)
+    _addPlayer(payload.playerId)
+    _setGameId(payload.gameId)
   }
 
-  function addPlayer(playerId) {
+  function _addPlayer(playerId) {
     const player = { id: playerId }
     players.value.push(player)
   }
-  function setGameId(id) {
+  function _setGameId(id) {
     gameId.value = id
   }
   function purge() {
@@ -41,5 +61,5 @@ export const useGameStore = defineStore('game', () => {
     sseService.disconnect()
   }
 
-  return { players, gameId, initSSE, addPlayer, setGameId, purge }
+  return { players, opponents, gameId, playerId, started, state, cards, initSSE, purge }
 })

@@ -12,11 +12,11 @@ class SSEService {
     )
 
     this.eventSource.addEventListener('open', () => {
-      console.log('SSE connected')
+      this.emit('open')
     })
 
     this.eventSource.addEventListener('error', (err) => {
-      console.error('SSE error:', err)
+      this.emit('error', err)
     })
 
     return this.eventSource

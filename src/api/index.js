@@ -14,3 +14,10 @@ export async function joinGame(gameId) {
   const body = await response.json()
   return [null, body]
 }
+
+export async function startGame(gameId) {
+  const response = await fetch(`${BASE_URL}/games/${gameId}/start`, { method: 'POST' })
+  if (!response.ok) return [true]
+  const body = await response.json()
+  return [null, body]
+}
