@@ -15,6 +15,11 @@ const router = createRouter({
           name: 'Home',
           component: () => import('@/views/HomeView.vue'),
         },
+        {
+          path: 'Game',
+          name: 'Game',
+          component: () => import('@/views/GameView.vue'),
+        },
       ],
     },
     {
@@ -25,11 +30,13 @@ const router = createRouter({
         {
           path: 'Card',
           name: 'CardPlayground',
+          meta: { testing: true },
           component: () => import('@/views/CardPlaygroundView.vue'),
         },
         {
           path: 'Deck',
           name: 'DeckPlayground',
+          meta: { testing: true },
           component: () => import('@/views/DeckPlaygroundView.vue'),
         },
       ],
