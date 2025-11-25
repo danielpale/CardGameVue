@@ -6,10 +6,14 @@ import { storeToRefs } from 'pinia'
 import BaseSection from '@/components/base/BaseSection.vue'
 import PlayerItem from '@/components/common/PlayerItem.vue'
 import BaseDeck from '@/components/base/BaseDeck.vue'
+import BaseBoard from '@/components/base/BaseBoard.vue'
 
 import { useGameStore } from '@/stores/game'
 
 import { PLAYERS_COORDS } from '@/constants/players'
+
+const CARD_HEIGHT = 160
+const CARD_WIDTH = 102
 
 onMounted(() => {
   if (started.value) return
@@ -19,7 +23,7 @@ onMounted(() => {
 const router = useRouter()
 
 const gameStore = useGameStore()
-const { opponents, started, cards } = storeToRefs(gameStore)
+const { opponents, started, cards, discardPileCard } = storeToRefs(gameStore)
 </script>
 
 <template>
@@ -31,7 +35,12 @@ const { opponents, started, cards } = storeToRefs(gameStore)
       :col="PLAYERS_COORDS[opponents.length][index].col"
       :row="PLAYERS_COORDS[opponents.length][index].row"
     />
-    <base-deck :cards="cards" :card-height="160" :card-width="102" />
+    <base-board
+      :discard-pile-card="discardPileCard"
+      :card-height="CARD_HEIGHT"
+      :card-width="CARD_WIDTH"
+    />
+    <base-deck :cards="cards" :card-height="CARD_HEIGHT" :card-width="CARD_WIDTH" />
   </base-section>
 </template>
 
@@ -44,6 +53,11 @@ const { opponents, started, cards } = storeToRefs(gameStore)
   & > .base-deck {
     grid-column: 1 / -1;
     grid-row: 10 / -1;
+  }
+
+  & > .base-board {
+    grid-column: 4 / 10;
+    grid-row: 4 / 10;
   }
 }
 </style>

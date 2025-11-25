@@ -15,6 +15,7 @@ export const useGameStore = defineStore('game', () => {
     if (!Array.isArray(state?.Hand)) return []
     return state.Hand.map((i) => `${i.color}-${i.number}`)
   })
+  const discardPileCard = computed(() => `${state?.PlayCard?.color}-${state?.PlayCard?.number}`)
 
   function initSSE(newGameId, newPlayerId, onSuccess = () => {}, onError = () => {}) {
     playerId.value = newPlayerId
@@ -61,5 +62,16 @@ export const useGameStore = defineStore('game', () => {
     sseService.disconnect()
   }
 
-  return { players, opponents, gameId, playerId, started, state, cards, initSSE, purge }
+  return {
+    cards,
+    discardPileCard,
+    gameId,
+    opponents,
+    playerId,
+    players,
+    started,
+    state,
+    initSSE,
+    purge,
+  }
 })
