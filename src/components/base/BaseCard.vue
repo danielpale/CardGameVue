@@ -7,7 +7,11 @@ import { POSITIONS, HEIGHT, WIDTH } from '@/constants/card'
 const SPRITE_WIDTH = 2048
 const SPRITE_HEIGHT = 2048
 
-const props = defineProps({ card: { type: String, default: 'back' } })
+const props = defineProps({
+  card: { type: String, default: 'back' },
+  height: { type: Number, default: HEIGHT },
+  width: { type: Number, default: WIDTH },
+})
 const model = defineModel({ type: [Boolean, Array, String], default: false })
 
 let tween
@@ -27,7 +31,11 @@ const selected = computed(() => {
 watch(selected, (value) => {
   if (!insideDeck) return
   if (value) {
-    gsap.to(containerTemplateRef.value, { y: -HEIGHT / 2, duration: 0.5, ease: 'power1.inOut' })
+    gsap.to(containerTemplateRef.value, {
+      y: -props.height / 2,
+      duration: 0.5,
+      ease: 'power1.inOut',
+    })
   } else {
     gsap.to(containerTemplateRef.value, { y: 0, duration: 0.5, ease: 'power1.inOut' })
   }
@@ -37,8 +45,8 @@ watch(selected, (value) => {
 function getCardStyle(card) {
   const style = { backgroundSize: '', backgroundPosition: '' }
   const { x, y, w, h } = POSITIONS[card] ?? {}
-  const scaleX = WIDTH / w
-  const scaleY = HEIGHT / h
+  const scaleX = props.width / w
+  const scaleY = props.height / h
   style.backgroundSize = `${SPRITE_WIDTH * scaleX}px ${SPRITE_HEIGHT * scaleY}px`
   style.backgroundPosition = `-${x * scaleX}px -${y * scaleY}px`
   return style
@@ -100,7 +108,7 @@ defineExpose({ flipCard, selectCard, deselectCard, getCard, card: props.card, se
     class="base-card__container"
     ref="baseCardContainer"
     :class="{ 'base-card--selected': selected }"
-    :style="{ height: `${HEIGHT}px`, width: `${WIDTH}px` }"
+    :style="{ height: `${props.height}px`, width: `${props.width}px` }"
     @mouseenter="handleMouseEnter"
     @mouseleave="handleMouseLeave"
     @click="selected ? deselectCard() : selectCard()"
