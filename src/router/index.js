@@ -39,6 +39,12 @@ const router = createRouter({
           meta: { testing: true },
           component: () => import('@/views/DeckPlaygroundView.vue'),
         },
+        {
+          path: 'Game',
+          name: 'GamePlayground',
+          meta: { testing: true },
+          component: () => import('@/views/GamePlaygroundView.vue'),
+        },
       ],
     },
   ],
