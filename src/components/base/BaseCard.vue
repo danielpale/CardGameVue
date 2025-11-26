@@ -160,6 +160,10 @@ defineExpose({ flipCard, selectCard, deselectCard, getCard, card: props.card, se
       border-radius: calc(20px + (var(--border-offset) / 2));
       opacity: var(--border-opacity);
     }
+
+    &:last-child {
+      --margin-right: 0px !important;
+    }
   }
 
   &__front,
