@@ -57,7 +57,7 @@ const { opponents, started, cards, discardPileCard } = storeToRefs(gameStore)
 
   & > .base-board {
     grid-column: 4 / 10;
-    grid-row: 4 / 10;
+    grid-row: 4 / 9;
   }
 }
 </style>
