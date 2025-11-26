@@ -20,7 +20,7 @@ onBeforeUnmount(() => {
   window.removeEventListener('resize', updateContainerWidth)
 })
 
-const cardSelected = ref(null)
+const cardSelected = defineModel()
 const containerWidth = ref(0)
 const baseDeckRef = useTemplateRef('baseDeck')
 
@@ -45,9 +45,10 @@ provide('overlap', overlap)
   <div ref="baseDeck" class="base-deck" :style="{ '--overlap': `-${overlap}px` }">
     <base-card
       v-model="cardSelected"
-      v-for="card in cards"
-      :key="card"
-      :card="card"
+      v-for="item in cards"
+      :key="item.id"
+      :id="item.id"
+      :card="item.card"
       :height="cardHeight"
       :width="cardWidth"
     />

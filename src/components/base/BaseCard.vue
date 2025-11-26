@@ -8,9 +8,11 @@ const SPRITE_WIDTH = 2048
 const SPRITE_HEIGHT = 2048
 
 const props = defineProps({
+  id: String,
   card: { type: String, default: 'back' },
   height: { type: Number, default: HEIGHT },
   width: { type: Number, default: WIDTH },
+  disabled: Boolean,
 })
 const model = defineModel({ type: [Boolean, Array, String], default: false })
 
@@ -20,11 +22,16 @@ const containerTemplateRef = useTemplateRef('baseCardContainer')
 const insideDeck = inject('insideDeck', false)
 const overlap = inject('overlap', 0)
 
+const _id = computed(() => {
+  if (props.id === undefined) return props.card
+  return props.id
+})
 const style = computed(() => getCardStyle(props.card))
 const selected = computed(() => {
+  if (props.disabled) return false
   if (typeof model.value === 'boolean') return model.value
-  if (typeof model.value === 'string' || model.value === null) return model.value === props.card
-  if (Array.isArray(model.value)) return model.value.includes(props.card)
+  if (typeof model.value === 'string' || model.value === null) return model.value === _id.value
+  if (Array.isArray(model.value)) return model.value.includes(_id.value)
   return model.value
 })
 
@@ -58,26 +65,31 @@ function flipCard() {
 }
 function selectCard() {
   if (typeof model.value === 'boolean') model.value = true
-  if (typeof model.value === 'string' || model.value === null) model.value = props.card
+  if (typeof model.value === 'string' || model.value === null) model.value = _id.value
   if (Array.isArray(model.value)) {
-    if (!model.value.includes(props.card)) model.value.push(props.card)
+    if (!model.value.includes(_id.value)) model.value.push(_id.value)
   }
 }
 function deselectCard() {
   if (typeof model.value === 'boolean') model.value = false
   if (typeof model.value === 'string' || model.value === null) model.value = null
   if (Array.isArray(model.value)) {
-    const index = model.value.indexOf(props.card)
+    const index = model.value.indexOf(_id.value)
     model.value.splice(index, 1)
   }
 }
 function getCard() {
-  return props.card
+  return { card: props.card, id: _id.value }
 }
 
 // Event Handlers
+function handleCardClick() {
+  if (props.disabled) return
+  selected.value ? deselectCard() : selectCard()
+}
 let borderOpacityTween
 function handleMouseEnter() {
+  if (props.disabled) return
   borderOpacityTween = gsap.to(containerTemplateRef.value, {
     '--border-opacity': 0.4,
     duration: 0.12,
@@ -91,6 +103,7 @@ function handleMouseEnter() {
   })
 }
 function handleMouseLeave() {
+  if (props.disabled) return
   borderOpacityTween.revert()
   if (!insideDeck) return
   gsap.to(containerTemplateRef.value, {
@@ -111,7 +124,7 @@ defineExpose({ flipCard, selectCard, deselectCard, getCard, card: props.card, se
     :style="{ height: `${props.height}px`, width: `${props.width}px` }"
     @mouseenter="handleMouseEnter"
     @mouseleave="handleMouseLeave"
-    @click="selected ? deselectCard() : selectCard()"
+    @click="handleCardClick"
   >
     <div ref="baseCard" class="base-card">
       <span class="base-card__front" :style="style"></span>

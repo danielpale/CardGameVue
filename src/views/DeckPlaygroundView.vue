@@ -26,13 +26,14 @@ const cards = [
   'red-9',
   'red-0',
 ]
+const cardsArr = cards.map((c) => ({ id: c, card: c }))
 </script>
 
 <template>
   <div class="d-flex flex-column ga-4 pa-4 h-100">
     <h1>Deck playground</h1>
     <div class="grid">
-      <base-deck :cards="cards" />
+      <base-deck :cards="cardsArr" />
     </div>
   </div>
 </template>

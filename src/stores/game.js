@@ -13,7 +13,7 @@ export const useGameStore = defineStore('game', () => {
   const opponents = computed(() => players.value.filter((p) => p.id !== playerId.value))
   const cards = computed(() => {
     if (!Array.isArray(state?.Hand)) return []
-    return state.Hand.map((i) => `${i.color}-${i.number}`)
+    return state.Hand.map((i) => ({ id: i.id, card: `${i.color}-${i.number}` }))
   })
   const discardPileCard = computed(() => `${state?.PlayCard?.color}-${state?.PlayCard?.number}`)
 

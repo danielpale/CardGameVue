@@ -54,6 +54,7 @@ const gvCards = [
   'red-9',
   'red-0',
 ]
+const gvCardsArr = gvCards.map((c) => ({ id: c, card: c }))
 </script>
 
 <template>
@@ -90,7 +91,7 @@ const gvCards = [
         :col="PLAYERS_COORDS[numPlayers][player - 1].col"
         :row="PLAYERS_COORDS[numPlayers][player - 1].row"
       />
-      <base-deck :cards="gvCards" :card-height="160" :card-width="102" />
+      <base-deck :cards="gvCardsArr" :card-height="160" :card-width="102" />
       <div class="btns">
         <v-btn :disabled="numPlayers <= 1" @click="numPlayers--">Rest player</v-btn>
         <v-btn :disabled="numPlayers >= 6" @click="numPlayers++">Add player</v-btn>
