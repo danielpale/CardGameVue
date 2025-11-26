@@ -16,11 +16,14 @@ export const useGameStore = defineStore('game', () => {
     return state.Hand.map((i) => ({ id: i.id, card: `${i.color}-${i.number}` }))
   })
   const discardPileCard = computed(() => `${state?.PlayCard?.color}-${state?.PlayCard?.number}`)
+  const playerInTurn = computed(() => state?.Turn)
+  const isTurnPlayer = computed(() => playerInTurn.value === playerId.value)
 
-  function initSSE(newGameId, newPlayerId, onSuccess = () => {}, onError = () => {}) {
-    playerId.value = newPlayerId
+  function initSSE(gameId, playerId, onSuccess = () => {}, onError = () => {}) {
+    _setPlayerId(playerId)
+    _setGameId(gameId)
 
-    sseService.connect(newGameId, newPlayerId)
+    sseService.connect(gameId, playerId)
 
     sseService.on('error', onError)
     sseService.on('open', onSuccess)
@@ -46,7 +49,6 @@ export const useGameStore = defineStore('game', () => {
 
   function onPlayerConnected(payload) {
     _addPlayer(payload.playerId)
-    _setGameId(payload.gameId)
   }
 
   function _addPlayer(playerId) {
@@ -55,6 +57,9 @@ export const useGameStore = defineStore('game', () => {
   }
   function _setGameId(id) {
     gameId.value = id
+  }
+  function _setPlayerId(id) {
+    playerId.value = id
   }
   function purge() {
     players.value = []
@@ -66,8 +71,10 @@ export const useGameStore = defineStore('game', () => {
     cards,
     discardPileCard,
     gameId,
+    isTurnPlayer,
     opponents,
     playerId,
+    playerInTurn,
     players,
     started,
     state,

@@ -3,7 +3,7 @@ import { computed } from 'vue'
 
 import DefaultAvatar from '@/assets/images/default-avatar.png'
 
-const props = defineProps({ username: String, col: Number, row: Number })
+const props = defineProps({ username: String, col: Number, row: Number, isOnTurn: Boolean })
 
 const position = computed(() => ({
   gridColumn: `${props.col} / span 2`,
@@ -13,7 +13,12 @@ const position = computed(() => ({
 
 <template>
   <div class="player-item" :style="{ ...position }">
-    <v-card width="fit-content" tile flat border="md opacity-100 black">
+    <v-card
+      width="fit-content"
+      tile
+      flat
+      :border="`md opacity-100 ${isOnTurn ? 'error' : 'black'} `"
+    >
       <v-img :src="DefaultAvatar" height="80" width="80" />
     </v-card>
     <p class="player-item__username">{{ username }}</p>

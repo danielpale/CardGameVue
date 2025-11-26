@@ -13,6 +13,8 @@ const props = defineProps({
 
 const OFFSET = 16
 
+const drawSelected = defineModel('draw-selected', { type: Boolean, default: false })
+
 const dimensions = computed(() => ({
   '--pile-height': `${props.cardHeight + OFFSET}px`,
   '--pile-width': `${props.cardWidth + OFFSET}px`,
@@ -22,10 +24,10 @@ const dimensions = computed(() => ({
 <template>
   <div class="base-board" :style="dimensions">
     <div class="discard-pile">
-      <base-card :card="discardPileCard" :height="cardHeight" :width="cardWidth" />
+      <base-card :card="discardPileCard" :height="cardHeight" :width="cardWidth" disabled />
     </div>
     <div class="draw-pile">
-      <base-card :height="cardHeight" :width="cardWidth" />
+      <base-card v-model="drawSelected" :height="cardHeight" :width="cardWidth" />
     </div>
   </div>
 </template>

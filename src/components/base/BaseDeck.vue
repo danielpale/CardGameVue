@@ -9,6 +9,7 @@ const props = defineProps({
   cards: { type: Array, default: () => [] },
   cardHeight: Number,
   cardWidth: { type: Number, default: WIDTH },
+  disabled: Boolean,
 })
 
 onMounted(() => {
@@ -51,6 +52,7 @@ provide('overlap', overlap)
       :card="item.card"
       :height="cardHeight"
       :width="cardWidth"
+      :disabled="disabled"
     />
   </div>
 </template>
