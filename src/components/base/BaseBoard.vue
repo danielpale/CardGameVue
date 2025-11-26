@@ -9,6 +9,7 @@ const props = defineProps({
   cardHeight: { type: Number, default: HEIGHT },
   cardWidth: { type: Number, default: WIDTH },
   discardPileCard: String,
+  disabledDrawCard: Boolean,
 })
 
 const OFFSET = 16
@@ -27,7 +28,12 @@ const dimensions = computed(() => ({
       <base-card :card="discardPileCard" :height="cardHeight" :width="cardWidth" disabled />
     </div>
     <div class="draw-pile">
-      <base-card v-model="drawSelected" :height="cardHeight" :width="cardWidth" />
+      <base-card
+        v-model="drawSelected"
+        :height="cardHeight"
+        :width="cardWidth"
+        :disabled="disabledDrawCard"
+      />
     </div>
   </div>
 </template>

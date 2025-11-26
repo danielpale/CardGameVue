@@ -63,15 +63,18 @@ async function handleDrawCard() {
       v-for="(player, index) in opponents"
       :key="player.id"
       :username="player.id"
-      :col="PLAYERS_COORDS[opponents.length][index].col"
-      :row="PLAYERS_COORDS[opponents.length][index].row"
+      :col="PLAYERS_COORDS[opponents.length][index]?.col"
+      :row="PLAYERS_COORDS[opponents.length][index]?.row"
+      :col-span="PLAYERS_COORDS[opponents.length][index]?.colSpan"
+      :row-span="PLAYERS_COORDS[opponents.length][index]?.rowSpan"
       :is-on-turn="player.id === playerInTurn"
     />
     <base-board
       v-model:draw-selected="drawCardSelected"
-      :discard-pile-card="discardPileCard"
       :card-height="CARD_HEIGHT"
       :card-width="CARD_WIDTH"
+      :discard-pile-card="discardPileCard"
+      :disabled-draw-card="!isTurnPlayer"
     />
     <div class="base-deck__wrapper">
       <base-deck
@@ -83,7 +86,9 @@ async function handleDrawCard() {
       />
     </div>
     <div class="game-view__buttons">
-      <v-chip v-if="isTurnPlayer" class="mb-4">It's your turn</v-chip>
+      <v-chip color="black" :variant="isTurnPlayer ? 'flat' : 'tonal'" class="mb-4">
+        {{ isTurnPlayer ? "It's your turn" : `Turn of: ${playerInTurn}` }}
+      </v-chip>
       <v-btn :disabled="playBtnDisabled" @click="handlePlayCard">Play card</v-btn>
       <v-btn :disabled="!drawCardSelected" @click="handleDrawCard">Draw Card</v-btn>
     </div>

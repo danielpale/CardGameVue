@@ -21,7 +21,7 @@ onBeforeUnmount(() => {
   window.removeEventListener('resize', updateContainerWidth)
 })
 
-const cardSelected = defineModel()
+const cardSelected = defineModel({ default: null })
 const containerWidth = ref(0)
 const baseDeckRef = useTemplateRef('baseDeck')
 
