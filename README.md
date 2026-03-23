@@ -1,23 +1,18 @@
-# card-game
+# Card Game
 
-This template should help get you started developing with Vue 3 in Vite.
+This is a web-based version of the classic **Uno card game**. The backend for this project was developed by [@vninomtz](https://github.com/vninomtz/card-game).
 
-## Recommended IDE Setup
+## Features
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+- Create new game
+- Join to a game
+- Lobby to wait until game start
+- Play card
+- Draw card
 
-## Recommended Browser Setup
+## Game demo
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd) 
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
+![Project demo](./src/assets/demo.gif)
 
 ## Project Setup
 
@@ -31,36 +26,18 @@ npm install
 npm run dev
 ```
 
-### Compile and Minify for Production
+## Tech stack
 
-```sh
-npm run build
-```
+- **Vue.js.** Core framework
+- **Vuetify.** UI component library.
+- **gsap.** Animation library.
 
-### Run Unit Tests with [Vitest](https://vitest.dev/)
+## Playground
 
-```sh
-npm run test:unit
-```
+This is a dedicated space where we prototyped and tested our core UI components before integrating into the game logic. _Visit: host/Playground_.
 
-### Run End-to-End Tests with [Cypress](https://www.cypress.io/)
+### Featured components include:
 
-```sh
-npm run test:e2e:dev
-```
-
-This runs the end-to-end tests against the Vite development server.
-It is much faster than the production build.
-
-But it's still recommended to test the production build with `test:e2e` before deploying (e.g. in CI environments):
-
-```sh
-npm run build
-npm run test:e2e
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
+- BaseCard.
+- BaseDeck.
+- BaseBoard.
